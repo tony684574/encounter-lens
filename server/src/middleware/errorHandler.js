@@ -1,6 +1,17 @@
 const ApiError = require("../utils/ApiError");
 
 function errorHandler(err, req, res, next) {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: "INVALID_JSON",
+        message: "Request body contains malformed JSON.",
+        details: []
+      }
+    });
+  }
+
   const isKnownError = err instanceof ApiError;
 
   const statusCode = isKnownError ? err.statusCode : 500;

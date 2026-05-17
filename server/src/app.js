@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const { clientOrigin } = require("./config/env");
 const apiRateLimiter = require("./middleware/rateLimiter");
 const authMiddleware = require("./middleware/authMiddleware");
+const requireJson = require("./middleware/requireJson");
 const errorHandler = require("./middleware/errorHandler");
 const ApiError = require("./utils/ApiError");
 
@@ -23,6 +24,7 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(requireJson);
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan("dev"));
 app.use(apiRateLimiter);
