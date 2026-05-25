@@ -3,6 +3,8 @@ import { getApiErrorMessage } from "../api/apiClient";
 import { getPatients } from "../api/patientApi";
 import { getScheduleByDate } from "../api/scheduleApi";
 import { cancelAppointment } from "../api/scheduleApi";
+import { deactivatePatient } from "../api/patientApi";
+import PatientForm from "../components/PatientForm";
 import PatientTable from "../components/PatientTable";
 import ScheduleTable from "../components/ScheduleTable";
 import AppointmentForm from "../components/AppointmentForm";
@@ -25,6 +27,7 @@ const [selectedDate, setSelectedDate] = useState(
   const [patients, setPatients] = useState([]);
 
   const [editingAppointment, setEditingAppointment] = useState(null);
+  const [editingPatient, setEditingPatient] = useState(null);
 
   const [scheduleError, setScheduleError] = useState("");
   const [patientsError, setPatientsError] = useState("");
@@ -54,6 +57,26 @@ const [selectedDate, setSelectedDate] = useState(
       await loadSchedule(selectedDate);
     } catch (error) {
       setScheduleError(getApiErrorMessage(error));
+    }
+  }
+
+  async function handleDeactivatePatient(patient) {
+    const confirmed = window.confirm(
+      `Deactivate ${patient.fullName || "this patient"}? They will be hidden from default patient searches.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setPatientsError("");
+
+    try {
+      await deactivatePatient(patient.id);
+      setEditingPatient(null);
+      await loadPatients();
+    } catch (error) {
+      setPatientsError(getApiErrorMessage(error));
     }
   }
 
@@ -185,10 +208,21 @@ const [selectedDate, setSelectedDate] = useState(
             </button>
           </div>
 
+          <PatientForm
+            editingPatient={editingPatient}
+            onPatientSaved={async () => {
+              setEditingPatient(null);
+              await loadPatients();
+            }}
+            onCancelEdit={() => setEditingPatient(null)}
+          />
+
           <PatientTable
             patients={patients}
             isLoading={isPatientsLoading}
             error={patientsError}
+            onEditPatient={setEditingPatient}
+            onDeactivatePatient={handleDeactivatePatient}
           />
         </section>
       </section>

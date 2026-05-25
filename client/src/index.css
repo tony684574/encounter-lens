@@ -417,3 +417,24 @@ select {
 .danger-button:hover {
   filter: brightness(0.98);
 }
+
+.patient-form {
+  border: 1px solid #e2e8ee;
+  border-radius: 18px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  background: #f8fbfb;
+}
+
+.patient-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 1000px) {
+  .patient-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

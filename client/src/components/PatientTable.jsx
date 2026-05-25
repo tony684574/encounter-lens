@@ -1,4 +1,10 @@
-function PatientTable({ patients, isLoading, error }) {
+function PatientTable({
+  patients,
+  isLoading,
+  error,
+  onEditPatient,
+  onDeactivatePatient
+}) {
   if (isLoading) {
     return <p className="subtle">Loading patients...</p>;
   }
@@ -23,6 +29,7 @@ function PatientTable({ patients, isLoading, error }) {
           <th>Birth Date</th>
           <th>Gender</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
 
@@ -33,6 +40,27 @@ function PatientTable({ patients, isLoading, error }) {
             <td>{patient.birthDate || "—"}</td>
             <td>{patient.gender || "unknown"}</td>
             <td>{patient.active ? "Active" : "Inactive"}</td>
+            <td>
+              <div className="table-actions">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => onEditPatient(patient)}
+                >
+                  Edit
+                </button>
+
+                {patient.active && (
+                  <button
+                    type="button"
+                    className="danger-button"
+                    onClick={() => onDeactivatePatient(patient)}
+                  >
+                    Deactivate
+                  </button>
+                )}
+              </div>
+            </td>
           </tr>
         ))}
       </tbody>
