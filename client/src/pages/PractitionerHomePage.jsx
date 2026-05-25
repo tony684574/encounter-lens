@@ -1,83 +1,36 @@
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "../api/apiClient";
-import { getPatients } from "../api/patientApi";
-import { getScheduleByDate } from "../api/scheduleApi";
-import { cancelAppointment } from "../api/scheduleApi";
-import { deactivatePatient } from "../api/patientApi";
-import PatientForm from "../components/PatientForm";
-import PatientTable from "../components/PatientTable";
-import ScheduleTable from "../components/ScheduleTable";
-import AppointmentForm from "../components/AppointmentForm";
+import { deactivatePatient, getPatients } from "../api/patientApi";
+import { cancelAppointment, getScheduleByDate } from "../api/scheduleApi";
+import PageHeader from "../components/PageHeader";
+import PatientSection from "../components/PatientSection";
 import ScheduleInsights from "../components/ScheduleInsights";
-import {
-  DEFAULT_TIME_ZONE,
-  getSupportedTimeZones,
-  getTodayDateString
-} from "../utils/dateUtils";
+import ScheduleSection from "../components/ScheduleSection";
+import PractitionerLayout from "../layouts/PractitionerLayout";
+import { DEFAULT_TIME_ZONE, getTodayDateString } from "../utils/dateUtils";
 
 function PractitionerHomePage() {
   const storedUser = localStorage.getItem("encounterLensUser");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-const [selectedTimeZone, setSelectedTimeZone] = useState(DEFAULT_TIME_ZONE);
-const [selectedDate, setSelectedDate] = useState(
-  getTodayDateString(DEFAULT_TIME_ZONE)
-);
+  const [selectedTimeZone, setSelectedTimeZone] = useState(DEFAULT_TIME_ZONE);
+  const [selectedDate, setSelectedDate] = useState(
+    getTodayDateString(DEFAULT_TIME_ZONE)
+  );
+
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
-
-  const [editingAppointment, setEditingAppointment] = useState(null);
-  const [editingPatient, setEditingPatient] = useState(null);
-
   const [scheduleError, setScheduleError] = useState("");
   const [patientsError, setPatientsError] = useState("");
-
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const [isPatientsLoading, setIsPatientsLoading] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [editingPatient, setEditingPatient] = useState(null);
 
   function handleLogout() {
     localStorage.removeItem("encounterLensToken");
     localStorage.removeItem("encounterLensUser");
     window.location.href = "/login";
-  }
-
-  async function handleCancelAppointment(appointment) {
-    const confirmed = window.confirm(
-      `Cancel appointment for ${appointment.patientName || "this patient"} at ${appointment.startTime}?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setScheduleError("");
-
-    try {
-      await cancelAppointment(appointment.id, "Cancelled from practitioner workspace");
-      await loadSchedule(selectedDate);
-    } catch (error) {
-      setScheduleError(getApiErrorMessage(error));
-    }
-  }
-
-  async function handleDeactivatePatient(patient) {
-    const confirmed = window.confirm(
-      `Deactivate ${patient.fullName || "this patient"}? They will be hidden from default patient searches.`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setPatientsError("");
-
-    try {
-      await deactivatePatient(patient.id);
-      setEditingPatient(null);
-      await loadPatients();
-    } catch (error) {
-      setPatientsError(getApiErrorMessage(error));
-    }
   }
 
   async function loadSchedule(date) {
@@ -108,6 +61,44 @@ const [selectedDate, setSelectedDate] = useState(
     }
   }
 
+  async function handleCancelAppointment(appointment) {
+    const confirmed = window.confirm(
+      `Cancel appointment for ${appointment.patientName || "this patient"} at ${appointment.startTime}?`
+    );
+
+    if (!confirmed) return;
+
+    setScheduleError("");
+
+    try {
+      await cancelAppointment(
+        appointment.id,
+        "Cancelled from practitioner workspace"
+      );
+      await loadSchedule(selectedDate);
+    } catch (error) {
+      setScheduleError(getApiErrorMessage(error));
+    }
+  }
+
+  async function handleDeactivatePatient(patient) {
+    const confirmed = window.confirm(
+      `Deactivate ${patient.fullName || "this patient"}? They will be hidden from default patient searches.`
+    );
+
+    if (!confirmed) return;
+
+    setPatientsError("");
+
+    try {
+      await deactivatePatient(patient.id);
+      setEditingPatient(null);
+      await loadPatients();
+    } catch (error) {
+      setPatientsError(getApiErrorMessage(error));
+    }
+  }
+
   useEffect(() => {
     loadSchedule(selectedDate);
   }, [selectedDate]);
@@ -117,116 +108,48 @@ const [selectedDate, setSelectedDate] = useState(
   }, []);
 
   return (
-    <main className="app-shell">
-      <header className="top-bar">
-        <div>
-          <p className="eyebrow">Encounter Lens</p>
-          <h1>Practitioner Workspace</h1>
-          <p className="subtle">
-            Manage the day’s encounters from one calm clinical desk.
-          </p>
-        </div>
-
-        <div className="top-bar-actions">
-          <span>{user?.username || "Practitioner"}</span>
-          
-          <label className="compact-label">
-            Time Zone
-            <select
-              value={selectedTimeZone}
-              onChange={(event) => {
-                const nextTimeZone = event.target.value;
-                setSelectedTimeZone(nextTimeZone);
-                setSelectedDate(getTodayDateString(nextTimeZone));
-              }}
-            >
-              {getSupportedTimeZones().map((timeZone) => (
-                <option key={timeZone.value} value={timeZone.value}>
-                  {timeZone.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          
-          <button type="button" onClick={handleLogout}>
-            Log out
-          </button>
-        </div>
-      </header>
-      <ScheduleInsights
-        appointments={appointments}
+    <PractitionerLayout user={user} onLogout={handleLogout}>
+      <PageHeader
         selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        selectedTimeZone={selectedTimeZone}
+        setSelectedTimeZone={setSelectedTimeZone}
       />
-      <section className="dashboard-grid">
-        <section className="panel">
-          <div className="panel-header">
-            <div>
-              <h2>Daily Schedule</h2>
-              <p className="subtle">Appointments for the selected date.</p>
-            </div>
 
-            <label className="date-picker-label">
-              Date
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(event) => setSelectedDate(event.target.value)}
-              />
-            </label>
-          </div>
+      <ScheduleInsights appointments={appointments} selectedDate={selectedDate} />
 
-          <AppointmentForm
-            patients={patients}
-            selectedDate={selectedDate}
-            editingAppointment={editingAppointment}
-            onAppointmentSaved={(date) => {
-              setEditingAppointment(null);
-              setSelectedDate(date);
-              loadSchedule(date);
-            }}
-            onCancelEdit={() => setEditingAppointment(null)}
-          />
+      <div className="workspace-stack">
+        <ScheduleSection
+          patients={patients}
+          appointments={appointments}
+          selectedDate={selectedDate}
+          isScheduleLoading={isScheduleLoading}
+          scheduleError={scheduleError}
+          editingAppointment={editingAppointment}
+          setEditingAppointment={setEditingAppointment}
+          onAppointmentSaved={(date) => {
+            setEditingAppointment(null);
+            setSelectedDate(date);
+            loadSchedule(date);
+          }}
+          onCancelAppointment={handleCancelAppointment}
+        />
 
-          <ScheduleTable
-            appointments={appointments}
-            isLoading={isScheduleLoading}
-            error={scheduleError}
-            onEditAppointment={setEditingAppointment}
-            onCancelAppointment={handleCancelAppointment}
-          />
-        </section>
-
-        <section className="panel">
-          <div className="panel-header">
-            <div>
-              <h2>Patients</h2>
-              <p className="subtle">FHIR patients available to this app.</p>
-            </div>
-
-            <button type="button" onClick={loadPatients}>
-              Refresh
-            </button>
-          </div>
-
-          <PatientForm
-            editingPatient={editingPatient}
-            onPatientSaved={async () => {
-              setEditingPatient(null);
-              await loadPatients();
-            }}
-            onCancelEdit={() => setEditingPatient(null)}
-          />
-
-          <PatientTable
-            patients={patients}
-            isLoading={isPatientsLoading}
-            error={patientsError}
-            onEditPatient={setEditingPatient}
-            onDeactivatePatient={handleDeactivatePatient}
-          />
-        </section>
-      </section>
-    </main>
+        <PatientSection
+          patients={patients}
+          isPatientsLoading={isPatientsLoading}
+          patientsError={patientsError}
+          editingPatient={editingPatient}
+          setEditingPatient={setEditingPatient}
+          onPatientSaved={async () => {
+            setEditingPatient(null);
+            await loadPatients();
+          }}
+          onDeactivatePatient={handleDeactivatePatient}
+          onRefreshPatients={loadPatients}
+        />
+      </div>
+    </PractitionerLayout>
   );
 }
 

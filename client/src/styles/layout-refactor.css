@@ -1,0 +1,108 @@
+/* Import this in main.jsx or copy it to the bottom of index.css */
+
+.practitioner-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.78);
+  border-right: 1px solid rgba(197, 223, 214, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sidebar-title {
+  margin: 0.25rem 0 0;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sidebar-link {
+  color: #284541;
+  text-decoration: none;
+  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: #eef6f4;
+  color: #2f7d73;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.practitioner-main {
+  padding: 2rem;
+}
+
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+
+.workspace-header h1 {
+  margin: 0.25rem 0 0;
+}
+
+.workspace-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.workspace-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.workspace-card {
+  scroll-margin-top: 2rem;
+}
+
+@media (max-width: 1000px) {
+  .practitioner-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    min-height: auto;
+  }
+
+  .sidebar-nav {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .practitioner-main {
+    padding: 1rem;
+  }
+
+  .workspace-header {
+    flex-direction: column;
+  }
+}
