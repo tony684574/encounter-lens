@@ -7,3 +7,9 @@ export async function getScheduleByDate(date) {
 
   return response.data.data;
 }
+
+export async function createAppointment(payload) {
+  const response = await apiClient.post("/schedule/appointments", payload);
+
+  return response.data.data.appointment;
+}

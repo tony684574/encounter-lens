@@ -4,6 +4,7 @@ import { getPatients } from "../api/patientApi";
 import { getScheduleByDate } from "../api/scheduleApi";
 import PatientTable from "../components/PatientTable";
 import ScheduleTable from "../components/ScheduleTable";
+import AppointmentForm from "../components/AppointmentForm";
 
 function getTodayDateString() {
   return new Date().toISOString().slice(0, 10);
@@ -102,6 +103,15 @@ function PractitionerHomePage() {
               />
             </label>
           </div>
+
+          <AppointmentForm
+            patients={patients}
+            selectedDate={selectedDate}
+            onAppointmentCreated={(date) => {
+              setSelectedDate(date);
+              loadSchedule(date);
+            }}
+          />
 
           <ScheduleTable
             appointments={appointments}

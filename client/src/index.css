@@ -182,3 +182,50 @@ label {
     align-items: stretch;
   }
 }
+
+.appointment-form {
+  border: 1px solid #e2e8ee;
+  border-radius: 18px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  background: #f8fbfb;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr 0.8fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.wide-field {
+  grid-column: 1 / -1;
+}
+
+select {
+  width: 100%;
+  border: 1px solid #ccd6dd;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 0.35rem;
+  background: white;
+  font: inherit;
+}
+
+.success-message {
+  border-radius: 10px;
+  background: #e9f8ef;
+  color: #1f6b3a;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 1000px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide-field {
+    grid-column: auto;
+  }
+}
