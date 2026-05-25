@@ -14,6 +14,7 @@ const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const auditRoutes = require("./routes/auditRoutes");
+const dbHealthRoutes = require("./routes/dbHealthRoutes");
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.get("/healthcheck", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 
+app.use("/healthcheck/db", dbHealthRoutes);
 app.use(authMiddleware);
 
 app.use("/api/patients", patientRoutes);
