@@ -2,22 +2,29 @@ import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "../api/apiClient";
 import { getPatients } from "../api/patientApi";
 import { getScheduleByDate } from "../api/scheduleApi";
+import { cancelAppointment } from "../api/scheduleApi";
 import PatientTable from "../components/PatientTable";
 import ScheduleTable from "../components/ScheduleTable";
 import AppointmentForm from "../components/AppointmentForm";
-
-function getTodayDateString() {
-  return new Date().toISOString().slice(0, 10);
-}
+import ScheduleInsights from "../components/ScheduleInsights";
+import {
+  DEFAULT_TIME_ZONE,
+  getSupportedTimeZones,
+  getTodayDateString
+} from "../utils/dateUtils";
 
 function PractitionerHomePage() {
   const storedUser = localStorage.getItem("encounterLensUser");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  const [selectedDate, setSelectedDate] = useState(getTodayDateString());
-
+const [selectedTimeZone, setSelectedTimeZone] = useState(DEFAULT_TIME_ZONE);
+const [selectedDate, setSelectedDate] = useState(
+  getTodayDateString(DEFAULT_TIME_ZONE)
+);
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
+
+  const [editingAppointment, setEditingAppointment] = useState(null);
 
   const [scheduleError, setScheduleError] = useState("");
   const [patientsError, setPatientsError] = useState("");
@@ -29,6 +36,25 @@ function PractitionerHomePage() {
     localStorage.removeItem("encounterLensToken");
     localStorage.removeItem("encounterLensUser");
     window.location.href = "/login";
+  }
+
+  async function handleCancelAppointment(appointment) {
+    const confirmed = window.confirm(
+      `Cancel appointment for ${appointment.patientName || "this patient"} at ${appointment.startTime}?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setScheduleError("");
+
+    try {
+      await cancelAppointment(appointment.id, "Cancelled from practitioner workspace");
+      await loadSchedule(selectedDate);
+    } catch (error) {
+      setScheduleError(getApiErrorMessage(error));
+    }
   }
 
   async function loadSchedule(date) {
@@ -80,12 +106,34 @@ function PractitionerHomePage() {
 
         <div className="top-bar-actions">
           <span>{user?.username || "Practitioner"}</span>
+          
+          <label className="compact-label">
+            Time Zone
+            <select
+              value={selectedTimeZone}
+              onChange={(event) => {
+                const nextTimeZone = event.target.value;
+                setSelectedTimeZone(nextTimeZone);
+                setSelectedDate(getTodayDateString(nextTimeZone));
+              }}
+            >
+              {getSupportedTimeZones().map((timeZone) => (
+                <option key={timeZone.value} value={timeZone.value}>
+                  {timeZone.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          
           <button type="button" onClick={handleLogout}>
             Log out
           </button>
         </div>
       </header>
-
+      <ScheduleInsights
+        appointments={appointments}
+        selectedDate={selectedDate}
+      />
       <section className="dashboard-grid">
         <section className="panel">
           <div className="panel-header">
@@ -107,16 +155,21 @@ function PractitionerHomePage() {
           <AppointmentForm
             patients={patients}
             selectedDate={selectedDate}
-            onAppointmentCreated={(date) => {
+            editingAppointment={editingAppointment}
+            onAppointmentSaved={(date) => {
+              setEditingAppointment(null);
               setSelectedDate(date);
               loadSchedule(date);
             }}
+            onCancelEdit={() => setEditingAppointment(null)}
           />
 
           <ScheduleTable
             appointments={appointments}
             isLoading={isScheduleLoading}
             error={scheduleError}
+            onEditAppointment={setEditingAppointment}
+            onCancelAppointment={handleCancelAppointment}
           />
         </section>
 

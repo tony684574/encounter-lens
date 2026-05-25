@@ -1,4 +1,10 @@
-function ScheduleTable({ appointments, isLoading, error }) {
+function ScheduleTable({
+  appointments,
+  isLoading,
+  error,
+  onEditAppointment,
+  onCancelAppointment
+}) {
   if (isLoading) {
     return <p className="subtle">Loading schedule...</p>;
   }
@@ -25,6 +31,7 @@ function ScheduleTable({ appointments, isLoading, error }) {
           <th>Gender</th>
           <th>Visit Type</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
 
@@ -39,6 +46,27 @@ function ScheduleTable({ appointments, isLoading, error }) {
             <td>{appointment.gender || "unknown"}</td>
             <td>{appointment.visitType || "General Visit"}</td>
             <td>{appointment.status}</td>
+            <td>
+              <div className="table-actions">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => onEditAppointment(appointment)}
+                >
+                  Edit
+                </button>
+
+                {appointment.status !== "cancelled" && (
+                  <button
+                    type="button"
+                    className="danger-button"
+                    onClick={() => onCancelAppointment(appointment)}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </td>
           </tr>
         ))}
       </tbody>

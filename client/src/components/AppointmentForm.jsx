@@ -1,19 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "../api/apiClient";
-import { createAppointment } from "../api/scheduleApi";
+import {
+  createAppointment,
+  updateAppointment
+} from "../api/scheduleApi";
 
-function AppointmentForm({ patients, selectedDate, onAppointmentCreated }) {
-  const [form, setForm] = useState({
+function getInitialForm(selectedDate) {
+  return {
     patientFhirId: "",
     scheduledDate: selectedDate,
     startTime: "09:00",
     endTime: "09:30",
-    visitType: "Diabetes Follow-Up"
-  });
+    visitType: "Diabetes Follow-Up",
+    status: "scheduled"
+  };
+}
 
+function AppointmentForm({
+  patients,
+  selectedDate,
+  editingAppointment,
+  onAppointmentSaved,
+  onCancelEdit
+}) {
+  const [form, setForm] = useState(getInitialForm(selectedDate));
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditMode = Boolean(editingAppointment);
+
+  useEffect(() => {
+    if (editingAppointment) {
+      setForm({
+        patientFhirId: editingAppointment.patientFhirId,
+        scheduledDate: editingAppointment.scheduledDate?.slice(0, 10) || selectedDate,
+        startTime: editingAppointment.startTime,
+        endTime: editingAppointment.endTime,
+        visitType: editingAppointment.visitType || "",
+        status: editingAppointment.status || "scheduled"
+      });
+    } else {
+      setForm(getInitialForm(selectedDate));
+    }
+
+    setError("");
+    setSuccessMessage("");
+  }, [editingAppointment, selectedDate]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -24,42 +57,64 @@ function AppointmentForm({ patients, selectedDate, onAppointmentCreated }) {
     }));
   }
 
+  function validateForm() {
+    if (!form.patientFhirId) {
+      return "Please choose a patient.";
+    }
+
+    if (!form.scheduledDate || !form.startTime || !form.endTime) {
+      return "Please provide a date, start time, and end time.";
+    }
+
+    if (form.endTime <= form.startTime) {
+      return "End time must be after start time.";
+    }
+
+    return "";
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     setSuccessMessage("");
 
-    if (!form.patientFhirId) {
-      setError("Please choose a patient.");
-      return;
-    }
+    const validationError = validateForm();
 
-    if (!form.scheduledDate || !form.startTime || !form.endTime) {
-      setError("Please provide a date, start time, and end time.");
-      return;
-    }
-
-    if (form.endTime <= form.startTime) {
-      setError("End time must be after start time.");
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await createAppointment(form);
+      if (isEditMode) {
+        await updateAppointment(editingAppointment.id, {
+          scheduledDate: form.scheduledDate,
+          startTime: form.startTime,
+          endTime: form.endTime,
+          visitType: form.visitType,
+          status: form.status
+        });
 
-      setSuccessMessage("Appointment created successfully.");
+        setSuccessMessage("Appointment updated successfully.");
+      } else {
+        await createAppointment({
+          patientFhirId: form.patientFhirId,
+          scheduledDate: form.scheduledDate,
+          startTime: form.startTime,
+          endTime: form.endTime,
+          visitType: form.visitType
+        });
 
-      setForm((current) => ({
-        ...current,
-        patientFhirId: "",
-        startTime: "09:00",
-        endTime: "09:30",
-        visitType: "Diabetes Follow-Up"
-      }));
+        setSuccessMessage("Appointment created successfully.");
+      }
 
-      onAppointmentCreated(form.scheduledDate);
+      onAppointmentSaved(form.scheduledDate);
+
+      if (!isEditMode) {
+        setForm(getInitialForm(form.scheduledDate));
+      }
     } catch (error) {
       setError(getApiErrorMessage(error));
     } finally {
@@ -69,6 +124,27 @@ function AppointmentForm({ patients, selectedDate, onAppointmentCreated }) {
 
   return (
     <form className="appointment-form" onSubmit={handleSubmit}>
+      <div className="form-title-row">
+        <div>
+          <h3>{isEditMode ? "Edit Appointment" : "Create Appointment"}</h3>
+          <p className="subtle">
+            {isEditMode
+              ? "Update the selected appointment."
+              : "Schedule a patient for the selected clinic day."}
+          </p>
+        </div>
+
+        {isEditMode && (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onCancelEdit}
+          >
+            Stop editing
+          </button>
+        )}
+      </div>
+
       <div className="form-grid">
         <label>
           Patient
@@ -76,6 +152,7 @@ function AppointmentForm({ patients, selectedDate, onAppointmentCreated }) {
             name="patientFhirId"
             value={form.patientFhirId}
             onChange={handleChange}
+            disabled={isEditMode}
           >
             <option value="">Select patient</option>
             {patients.map((patient) => (
@@ -125,13 +202,36 @@ function AppointmentForm({ patients, selectedDate, onAppointmentCreated }) {
             placeholder="Diabetes Follow-Up"
           />
         </label>
+
+        {isEditMode && (
+          <label className="wide-field">
+            Status
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+            >
+              <option value="scheduled">Scheduled</option>
+              <option value="checked-in">Checked In</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="no-show">No Show</option>
+            </select>
+          </label>
+        )}
       </div>
 
       {error && <div className="error-message">{error}</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
 
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create appointment"}
+        {isSubmitting
+          ? isEditMode
+            ? "Updating..."
+            : "Creating..."
+          : isEditMode
+            ? "Update appointment"
+            : "Create appointment"}
       </button>
     </form>
   );
