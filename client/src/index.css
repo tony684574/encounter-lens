@@ -791,10 +791,52 @@ select {
 
 .weekly-calendar-shell {
   width: 100%;
-  overflow-x: auto;
+  max-height: 68vh;
+  overflow: auto;
   border: 1px solid #e2e8ee;
   border-radius: 18px;
   background: white;
+}
+
+.calendar-time-slot {
+  position: relative;
+  min-height: 96px;
+  padding: 0.45rem;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.current-time-marker {
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  z-index: 12;
+  height: 2px;
+  background: #d94835;
+  pointer-events: none;
+}
+
+.current-time-marker::before {
+  content: "";
+  position: absolute;
+  left: -0.15rem;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #d94835;
+  transform: translateY(-50%);
+}
+
+.current-time-marker span {
+  position: absolute;
+  right: 0;
+  top: -0.85rem;
+  border-radius: 999px;
+  padding: 0.12rem 0.4rem;
+  background: #d94835;
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 800;
 }
 
 .weekly-calendar-grid {
@@ -966,4 +1008,35 @@ select {
   border: 1px dashed #b8d8d1;
   background: #eef6f4;
   color: #2f7d73;
+}
+
+.clinic-clock {
+  min-width: 190px;
+  border: 1px solid #d7e6e2;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 10px 24px rgba(31, 41, 51, 0.06);
+}
+
+.clinic-clock-label {
+  display: block;
+  color: #2f7d73;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.clinic-clock strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.25rem;
+}
+
+.clinic-clock span:last-child {
+  display: block;
+  margin-top: 0.15rem;
+  color: #62717b;
+  font-size: 0.78rem;
 }

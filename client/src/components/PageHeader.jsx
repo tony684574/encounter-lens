@@ -1,4 +1,5 @@
 import { getSupportedTimeZones, getTodayDateString } from "../utils/dateUtils";
+import ClinicClock from "./clinicClock";
 
 function PageHeader({
   selectedDate,
@@ -17,6 +18,7 @@ function PageHeader({
       </div>
 
       <div className="workspace-controls">
+        <ClinicClock timeZone={selectedTimeZone}/>
         <label className="compact-label">
           Date
           <input

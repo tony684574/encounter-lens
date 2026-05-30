@@ -15,6 +15,7 @@ import {
 } from "../utils/dateUtils";
 import {
   addDays,
+  getNextAvailableSlot,
   getStartOfWeek,
   getWeekDays
 } from "../utils/calendarUtils";
@@ -80,21 +81,37 @@ function CalendarPage() {
     setAppointmentDefaults(null);
   }
 
-function openCreateAppointmentModal({
-  date,
-  startTime = "09:00",
-  endTime = getDefaultEndTime(startTime)
-}) {
-  setSelectedDate(date);
-  setEditingAppointment(null);
-  setAppointmentDefaults({
-    scheduledDate: date,
-    startTime,
-    endTime,
-    visitType: "General Visit"
-  });
-  setIsModalOpen(true);
-}
+  function openCreateAppointmentModal({
+    date,
+    startTime = "09:00",
+    endTime = getDefaultEndTime(startTime)
+  }) {
+    setSelectedDate(date);
+    setEditingAppointment(null);
+    setAppointmentDefaults({
+      scheduledDate: date,
+      startTime,
+      endTime,
+      visitType: "General Visit"
+    });
+    setIsModalOpen(true);
+  }
+
+  function openSmartCreateAppointmentModal() {
+    const nextSlot = getNextAvailableSlot({
+      date: selectedDate,
+      timeZone: selectedTimeZone,
+      appointments
+    });
+
+    openCreateAppointmentModal(
+      nextSlot || {
+        date: selectedDate,
+        startTime: "08:00",
+        endTime: "08:30"
+      }
+    );
+  }
 
   function openEditAppointmentModal(appointment) {
     setSelectedDate(appointment.scheduledDate?.slice(0, 10) || selectedDate);
@@ -201,7 +218,7 @@ function openCreateAppointmentModal({
 
             <button
               type="button"
-              onClick={() => openCreateAppointmentModal({date: selectedDate})}
+              onClick={openSmartCreateAppointmentModal}
             >
               New Appointment
             </button>
