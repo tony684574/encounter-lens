@@ -22,55 +22,57 @@ function ScheduleTable({
   }
 
   return (
-    <table className="data-table">
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Patient</th>
-          <th>Birth Date</th>
-          <th>Gender</th>
-          <th>Visit Type</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+    <div className="table-scroll">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Birth Date</th>
+            <th>Gender</th>
+            <th>Visit Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        {appointments.map((appointment) => (
-          <tr key={appointment.id}>
-            <td>
-              {appointment.startTime}–{appointment.endTime}
-            </td>
-            <td>{appointment.patientName}</td>
-            <td>{appointment.birthDate || "—"}</td>
-            <td>{appointment.gender || "unknown"}</td>
-            <td>{appointment.visitType || "General Visit"}</td>
-            <td>{appointment.status}</td>
-            <td>
-              <div className="table-actions">
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => onEditAppointment(appointment)}
-                >
-                  Edit
-                </button>
-
-                {appointment.status !== "cancelled" && (
+        <tbody>
+          {appointments.map((appointment) => (
+            <tr key={appointment.id}>
+              <td>
+                {appointment.startTime}–{appointment.endTime}
+              </td>
+              <td>{appointment.patientName}</td>
+              <td>{appointment.birthDate || "—"}</td>
+              <td>{appointment.gender || "unknown"}</td>
+              <td>{appointment.visitType || "General Visit"}</td>
+              <td>{appointment.status}</td>
+              <td>
+                <div className="table-actions">
                   <button
                     type="button"
-                    className="danger-button"
-                    onClick={() => onCancelAppointment(appointment)}
+                    className="secondary-button"
+                    onClick={() => onEditAppointment(appointment)}
                   >
-                    Cancel
+                    Edit
                   </button>
-                )}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+
+                  {appointment.status !== "cancelled" && (
+                    <button
+                      type="button"
+                      className="danger-button"
+                      onClick={() => onCancelAppointment(appointment)}
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

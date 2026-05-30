@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 function PatientTable({
   patients,
   isLoading,
@@ -5,6 +7,14 @@ function PatientTable({
   onEditPatient,
   onDeactivatePatient
 }) {
+  const [openMenuPatientId, setOpenMenuPatientId] = useState(null);
+
+  function toggleMenu(patientId) {
+    setOpenMenuPatientId((currentId) =>
+      currentId === patientId ? null : patientId
+    );
+  }
+
   if (isLoading) {
     return <p className="subtle">Loading patients...</p>;
   }
@@ -22,49 +32,73 @@ function PatientTable({
   }
 
   return (
-    <table className="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Birth Date</th>
-          <th>Gender</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+    <div className="table-scroll">
+        <table className="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Birth Date</th>
+            <th>Gender</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        {patients.map((patient) => (
-          <tr key={patient.id}>
-            <td>{patient.fullName}</td>
-            <td>{patient.birthDate || "—"}</td>
-            <td>{patient.gender || "unknown"}</td>
-            <td>{patient.active ? "Active" : "Inactive"}</td>
-            <td>
-              <div className="table-actions">
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => onEditPatient(patient)}
-                >
-                  Edit
-                </button>
-
-                {patient.active && (
+        <tbody>
+          {patients.map((patient) => (
+            <tr key={patient.id}>
+              <td>{patient.fullName}</td>
+              <td>{patient.birthDate || "—"}</td>
+              <td>{patient.gender || "unknown"}</td>
+              <td>{patient.active ? "Active" : "Inactive"}</td>
+              <td>
+                <div className="table-actions">
                   <button
                     type="button"
-                    className="danger-button"
-                    onClick={() => onDeactivatePatient(patient)}
+                    className="secondary-button"
+                    onClick={() => onEditPatient(patient)}
                   >
-                    Deactivate
+                    Edit
                   </button>
-                )}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+
+                  {patient.active && (
+                    <div 
+                      className="row-menu"
+                      onMouseLeave={() => setOpenMenuPatientId(null)}
+                    >
+                      <button
+                        type="button"
+                        className="danger-menu-button"
+                        onClick={() => toggleMenu(patient.id)}
+                        aria-label={`Open actions for ${patient.fullName}`}
+                        aria-expanded={openMenuPatientId === patient.id}
+                      >
+                        ▾
+                      </button>
+
+                      {openMenuPatientId === patient.id && (
+                        <div className="row-menu-popover">
+                          <button
+                            type="button"
+                            className="row-menu-danger-item"
+                            onClick={() => {
+                              setOpenMenuPatientId(null);
+                              onDeactivatePatient(patient);
+                            }}
+                          >
+                            Deactivate
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
