@@ -8,6 +8,17 @@ export async function getScheduleByDate(date) {
   return response.data.data;
 }
 
+export async function getScheduleByRange(startDate, endDate) {
+  const response = await apiClient.get("/schedule/range", {
+    params: {
+      startDate,
+      endDate
+    }
+  });
+
+  return response.data.data;
+}
+
 export async function createAppointment(payload) {
   const response = await apiClient.post("/schedule/appointments", payload);
 

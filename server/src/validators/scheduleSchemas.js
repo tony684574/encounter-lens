@@ -37,6 +37,33 @@ const getScheduleSchema = z.object({
   })
 });
 
+const getScheduleRangeSchema = z
+  .object({
+    body: z.object({}).optional(),
+    params: z.object({}).optional(),
+    query: z.object({
+      startDate: dateSchema,
+      endDate: dateSchema
+    })
+  })
+  .refine((data) => data.query.endDate >= data.query.startDate, {
+    message: "End date must be on or after start date.",
+    path: ["query", "endDate"]
+  })
+  .refine(
+    (data) => {
+      const start = new Date(`${data.query.startDate}T00:00:00Z`);
+      const end = new Date(`${data.query.endDate}T00:00:00Z`);
+      const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+
+      return diffDays <= 45;
+    },
+    {
+      message: "Schedule range cannot be greater than 45 days.",
+      path: ["query", "endDate"]
+    }
+  );
+
 const createAppointmentSchema = z.object({
   body: appointmentBodySchema,
   params: z.object({}).optional(),
@@ -74,6 +101,7 @@ const cancelAppointmentSchema = z.object({
 
 module.exports = {
   getScheduleSchema,
+  getScheduleRangeSchema,
   createAppointmentSchema,
   updateAppointmentSchema,
   cancelAppointmentSchema

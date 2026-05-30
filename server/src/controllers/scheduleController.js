@@ -15,6 +15,24 @@ async function getSchedule(req, res) {
   });
 }
 
+async function getScheduleRange(req, res) {
+  const { startDate, endDate } = req.validated.query;
+
+  const appointments = await scheduleService.getScheduleByDateRange(
+    startDate,
+    endDate
+  );
+
+  res.json({
+    success: true,
+    data: {
+      startDate,
+      endDate,
+      appointments
+    }
+  });
+}
+
 async function createAppointment(req, res) {
   const payload = req.validated.body;
 
@@ -79,6 +97,7 @@ async function cancelAppointment(req, res) {
 
 module.exports = {
   getSchedule,
+  getScheduleRange,
   createAppointment,
   updateAppointment,
   cancelAppointment

@@ -627,3 +627,343 @@ select {
   z-index: 5;
   background: rgba(238, 248, 244, 0.98);
 }
+
+.calendar-panel {
+  min-height: 70vh;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(180px, 1fr));
+  gap: 0.8rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.calendar-day {
+  min-height: 420px;
+  border: 1px solid #e2e8ee;
+  border-radius: 18px;
+  background: rgba(248, 251, 251, 0.9);
+  overflow: hidden;
+}
+
+.calendar-day-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.8rem;
+  background: rgba(238, 248, 244, 0.95);
+  border-bottom: 1px solid #e2e8ee;
+}
+
+.calendar-day-header span {
+  color: #62717b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.calendar-day-body {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.75rem;
+}
+
+.calendar-empty {
+  color: #8b9aa3;
+  font-size: 0.9rem;
+}
+
+.calendar-appointment {
+  display: grid;
+  gap: 0.65rem;
+  border: 1px solid #d7e6e2;
+  border-left: 5px solid #2f7d73;
+  border-radius: 14px;
+  background: white;
+  padding: 0.75rem;
+  box-shadow: 0 8px 18px rgba(31, 41, 51, 0.06);
+}
+
+.calendar-appointment p {
+  margin: 0.25rem 0;
+}
+
+.calendar-appointment span {
+  color: #62717b;
+  font-size: 0.85rem;
+}
+
+.calendar-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.calendar-card-actions button {
+  padding: 0.36rem 0.55rem;
+  font-size: 0.72rem;
+  box-shadow: none;
+}
+
+.calendar-appointment.status-cancelled {
+  opacity: 0.65;
+  border-left-color: #a13b2b;
+}
+
+.calendar-appointment.status-completed {
+  border-left-color: #64748b;
+}
+
+.calendar-appointment.status-no-show {
+  border-left-color: #b7791f;
+}
+
+@media (max-width: 1200px) {
+  .calendar-grid {
+    grid-template-columns: repeat(7, 180px);
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(20, 36, 34, 0.38);
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  width: min(100%, 760px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 24px;
+  background: white;
+  padding: 1.25rem;
+  box-shadow: 0 30px 80px rgba(20, 36, 34, 0.28);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0.25rem 0 0;
+}
+
+.calendar-empty-slot {
+  width: 100%;
+  border: 1px dashed #b8d8d1;
+  background: rgba(238, 246, 244, 0.8);
+  color: #2f7d73;
+  box-shadow: none;
+  padding: 0.75rem;
+}
+
+.calendar-empty-slot:hover {
+  background: #eef6f4;
+}
+
+.calendar-appointment.status-cancelled {
+  opacity: 0.78;
+  border-left-color: #a13b2b;
+  background: #fffafa;
+  box-shadow: none;
+}
+
+.calendar-appointment.status-cancelled strong,
+.calendar-appointment.status-cancelled p,
+.calendar-appointment.status-cancelled span {
+  color: #8d6a64;
+}
+
+.calendar-appointment.status-cancelled .calendar-card-actions {
+  display: none;
+}
+
+.weekly-calendar-shell {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e2e8ee;
+  border-radius: 18px;
+  background: white;
+}
+
+.weekly-calendar-grid {
+  min-width: 1120px;
+  display: grid;
+  grid-template-columns: 80px repeat(7, minmax(140px, 1fr));
+}
+
+.calendar-corner-cell,
+.calendar-day-column-header,
+.calendar-time-cell,
+.calendar-time-slot {
+  border-right: 1px solid #e2e8ee;
+  border-bottom: 1px solid #e2e8ee;
+}
+
+.calendar-corner-cell {
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  background: #eef6f4;
+  color: #62717b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.calendar-day-column-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: 58px;
+  padding: 0.8rem;
+  background: rgba(238, 248, 244, 0.98);
+  text-align: center;
+}
+
+.calendar-day-column-header span {
+  display: inline-block;
+  margin-top: 0.25rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  background: #2f7d73;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.calendar-day-column-header.is-today {
+  background: #dff3ee;
+  box-shadow: inset 0 -3px 0 #2f7d73;
+}
+
+.calendar-row-fragment {
+  display: contents;
+}
+
+.calendar-time-cell {
+  position: sticky;
+  left: 0;
+  z-index: 8;
+  min-height: 96px;
+  padding: 0.75rem 0.5rem;
+  background: #fbfdfc;
+  color: #62717b;
+  font-weight: 800;
+  text-align: center;
+}
+
+.calendar-time-slot {
+  position: relative;
+  min-height: 96px;
+  padding: 0.45rem;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.calendar-time-slot.is-today-slot {
+  background: rgba(223, 243, 238, 0.45);
+}
+
+.calendar-time-slot:hover {
+  background: #f8fbfb;
+}
+
+.calendar-slot-add {
+  width: 100%;
+  height: 100%;
+  min-height: 42px;
+  border: 1px dashed transparent;
+  background: transparent;
+  color: transparent;
+  box-shadow: none;
+}
+
+.calendar-time-slot:hover .calendar-slot-add {
+  border-color: #b8d8d1;
+  background: rgba(238, 246, 244, 0.8);
+  color: #2f7d73;
+}
+
+.calendar-slot-appointment {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid #d7e6e2;
+  border-left: 5px solid #2f7d73;
+  border-radius: 12px;
+  background: white;
+  padding: 0.55rem;
+  box-shadow: 0 8px 18px rgba(31, 41, 51, 0.06);
+}
+
+.calendar-slot-appointment strong {
+  display: block;
+  font-size: 0.8rem;
+}
+
+.calendar-slot-appointment p {
+  margin: 0.2rem 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.calendar-slot-appointment span {
+  color: #62717b;
+  font-size: 0.76rem;
+}
+
+.calendar-slot-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.calendar-slot-actions button,
+.after-cancelled {
+  height: auto;
+  min-height: 0;
+  padding: 0.32rem 0.48rem;
+  font-size: 0.7rem;
+  box-shadow: none;
+}
+
+.calendar-slot-appointment.status-cancelled {
+  opacity: 0.75;
+  border-left-color: #a13b2b;
+  background: #fffafa;
+  box-shadow: none;
+}
+
+.calendar-slot-appointment.status-cancelled strong,
+.calendar-slot-appointment.status-cancelled p,
+.calendar-slot-appointment.status-cancelled span {
+  color: #8d6a64;
+}
+
+.calendar-slot-appointment.status-completed {
+  border-left-color: #64748b;
+}
+
+.calendar-slot-appointment.status-no-show {
+  border-left-color: #b7791f;
+}
+
+.after-cancelled {
+  border: 1px dashed #b8d8d1;
+  background: #eef6f4;
+  color: #2f7d73;
+}

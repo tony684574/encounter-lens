@@ -7,9 +7,15 @@ function Sidebar({ user, onLogout }) {
       </div>
 
       <nav className="sidebar-nav" aria-label="Practitioner navigation">
-        <a href="#today" className="sidebar-link active">Today</a>
-        <a href="#schedule" className="sidebar-link">Schedule</a>
-        <a href="#patients" className="sidebar-link">Patients</a>
+        <a href="/" className="sidebar-link">
+          Today
+        </a>
+        <a href="/calendar" className="sidebar-link">
+          Calendar
+        </a>
+        <a href="/#patients" className="sidebar-link">
+          Patients
+        </a>
       </nav>
 
       <div className="sidebar-footer">
@@ -20,6 +26,7 @@ function Sidebar({ user, onLogout }) {
         </button>
       </div>
     </aside>
+    
   );
 }
 

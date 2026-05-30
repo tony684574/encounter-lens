@@ -5,14 +5,14 @@ import {
   updateAppointment
 } from "../api/scheduleApi";
 
-function getInitialForm(selectedDate) {
+function getInitialForm(selectedDate, appointmentDefaults = {}) {
   return {
-    patientFhirId: "",
-    scheduledDate: selectedDate,
-    startTime: "09:00",
-    endTime: "09:30",
-    visitType: "Diabetes Follow-Up",
-    status: "scheduled"
+    patientFhirId: appointmentDefaults.patientFhirId || "",
+    scheduledDate: appointmentDefaults.scheduledDate || selectedDate,
+    startTime: appointmentDefaults.startTime || "09:00",
+    endTime: appointmentDefaults.endTime || "09:30",
+    visitType: appointmentDefaults.visitType || "Diabetes Follow-Up",
+    status: appointmentDefaults.status || "scheduled"
   };
 }
 
@@ -20,10 +20,13 @@ function AppointmentForm({
   patients,
   selectedDate,
   editingAppointment,
+  appointmentDefaults,
   onAppointmentSaved,
   onCancelEdit
 }) {
-  const [form, setForm] = useState(getInitialForm(selectedDate));
+  const [form, setForm] = useState(() => 
+    getInitialForm(selectedDate, appointmentDefaults)
+  );
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,12 +44,12 @@ function AppointmentForm({
         status: editingAppointment.status || "scheduled"
       });
     } else {
-      setForm(getInitialForm(selectedDate));
+      setForm(getInitialForm(selectedDate, appointmentDefaults));
     }
 
     setError("");
     setSuccessMessage("");
-  }, [editingAppointment, selectedDate]);
+  }, [editingAppointment, selectedDate, appointmentDefaults]);
 
   function handleChange(event) {
     const { name, value } = event.target;

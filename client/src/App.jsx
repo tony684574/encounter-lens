@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import PractitionerHomePage from "./pages/PractitionerHomePage";
+import CalendarPage from "./pages/CalendarPage";
+
 import "./App.css";
 
 function ProtectedRoute({ children }) {
@@ -22,6 +24,14 @@ function App() {
         element={
           <ProtectedRoute>
             <PractitionerHomePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <CalendarPage />
           </ProtectedRoute>
         }
       />

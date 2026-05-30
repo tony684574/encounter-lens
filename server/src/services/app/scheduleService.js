@@ -44,6 +44,48 @@ async function getScheduleByDate(date) {
   return appointments;
 }
 
+async function getScheduleByDateRange(startDate, endDate) {
+  const query = `
+    SELECT
+      id,
+      patient_fhir_id AS "patientFhirId",
+      scheduled_date AS "scheduledDate",
+      to_char(start_time, 'HH24:MI') AS "startTime",
+      to_char(end_time, 'HH24:MI') AS "endTime",
+      visit_type AS "visitType",
+      status
+    FROM provider_schedule
+    WHERE scheduled_date BETWEEN $1 AND $2
+    ORDER BY scheduled_date ASC, start_time ASC
+  `;
+
+  const result = await pool.query(query, [startDate, endDate]);
+
+  const appointments = await Promise.all(
+    result.rows.map(async (row) => {
+      try {
+        const patient = await patientFhirService.getPatientById(row.patientFhirId);
+
+        return {
+          ...row,
+          patientName: patient.fullName,
+          birthDate: patient.birthDate,
+          gender: patient.gender
+        };
+      } catch {
+        return {
+          ...row,
+          patientName: "Unknown Patient",
+          birthDate: null,
+          gender: "unknown"
+        };
+      }
+    })
+  );
+
+  return appointments;
+}
+
 async function assertNoOverlap({ scheduledDate, startTime, endTime, excludeAppointmentId = null }) {
   const values = [scheduledDate, startTime, endTime];
   let excludeClause = "";
@@ -181,6 +223,7 @@ async function cancelAppointment(appointmentId) {
 
 module.exports = {
   getScheduleByDate,
+  getScheduleByDateRange,
   createAppointment,
   updateAppointment,
   cancelAppointment

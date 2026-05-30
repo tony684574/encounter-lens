@@ -4,6 +4,7 @@ const validateRequest = require("../middleware/validateRequest");
 const wrapAsync = require("../utils/wrapAsync");
 const {
   getScheduleSchema,
+  getScheduleRangeSchema,
   createAppointmentSchema,
   updateAppointmentSchema,
   cancelAppointmentSchema
@@ -15,6 +16,12 @@ router.get(
   "/",
   validateRequest(getScheduleSchema),
   wrapAsync(scheduleController.getSchedule)
+);
+
+router.get(
+  "/range",
+  validateRequest(getScheduleRangeSchema),
+  wrapAsync(scheduleController.getScheduleRange)
 );
 
 router.post(
