@@ -10,7 +10,7 @@ import AppointmentModal from "../components/AppointmentModal";
 import PageHeader from "../components/PageHeader";
 import PractitionerLayout from "../layouts/PractitionerLayout";
 import {
-  DEFAULT_TIME_ZONE,
+  getStoredTimeZone,
   getTodayDateString
 } from "../utils/dateUtils";
 import {
@@ -25,14 +25,17 @@ function CalendarPage() {
   const storedUser = localStorage.getItem("encounterLensUser");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  const [selectedTimeZone, setSelectedTimeZone] = useState(DEFAULT_TIME_ZONE);
-  const [selectedDate, setSelectedDate] = useState(
-    getTodayDateString(DEFAULT_TIME_ZONE)
+  const [selectedTimeZone, setSelectedTimeZone] = useState(() =>
+    getStoredTimeZone()
   );
 
-  const [weekStartDate, setWeekStartDate] = useState(
-    getStartOfWeek(getTodayDateString(DEFAULT_TIME_ZONE))
+  const [selectedDate, setSelectedDate] = useState(() =>
+    getTodayDateString(getStoredTimeZone())
   );
+
+const [weekStartDate, setWeekStartDate] = useState(() =>
+  getStartOfWeek(getTodayDateString(getStoredTimeZone()))
+);
 
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);

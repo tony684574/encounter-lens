@@ -1,4 +1,13 @@
 export const DEFAULT_TIME_ZONE = "Pacific/Honolulu";
+export const TIME_ZONE_STORAGE_KEY = "encounterLensTimeZone";
+
+export function getStoredTimeZone() {
+  return localStorage.getItem(TIME_ZONE_STORAGE_KEY) || DEFAULT_TIME_ZONE;
+}
+
+export function saveStoredTimeZone(timeZone) {
+  localStorage.setItem(TIME_ZONE_STORAGE_KEY, timeZone);
+}
 
 export function getTodayDateString(timeZone = DEFAULT_TIME_ZONE) {
   const formatter = new Intl.DateTimeFormat("en-CA", {

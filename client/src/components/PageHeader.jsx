@@ -1,4 +1,4 @@
-import { getSupportedTimeZones, getTodayDateString } from "../utils/dateUtils";
+import { getSupportedTimeZones, getTodayDateString, saveStoredTimeZone } from "../utils/dateUtils";
 import ClinicClock from "./clinicClock";
 
 function PageHeader({
@@ -34,6 +34,8 @@ function PageHeader({
             value={selectedTimeZone}
             onChange={(event) => {
               const nextTimeZone = event.target.value;
+
+              saveStoredTimeZone(nextTimeZone);
               setSelectedTimeZone(nextTimeZone);
               setSelectedDate(getTodayDateString(nextTimeZone));
             }}

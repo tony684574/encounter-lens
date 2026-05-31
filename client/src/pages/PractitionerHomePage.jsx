@@ -7,15 +7,18 @@ import PatientSection from "../components/PatientSection";
 import ScheduleInsights from "../components/ScheduleInsights";
 import ScheduleSection from "../components/ScheduleSection";
 import PractitionerLayout from "../layouts/PractitionerLayout";
-import { DEFAULT_TIME_ZONE, getTodayDateString } from "../utils/dateUtils";
+import { getStoredTimeZone, getTodayDateString } from "../utils/dateUtils";
 
 function PractitionerHomePage() {
   const storedUser = localStorage.getItem("encounterLensUser");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  const [selectedTimeZone, setSelectedTimeZone] = useState(DEFAULT_TIME_ZONE);
-  const [selectedDate, setSelectedDate] = useState(
-    getTodayDateString(DEFAULT_TIME_ZONE)
+  const [selectedTimeZone, setSelectedTimeZone] = useState(() =>
+    getStoredTimeZone()
+  );
+
+  const [selectedDate, setSelectedDate] = useState(() =>
+    getTodayDateString(getStoredTimeZone())
   );
 
   const [appointments, setAppointments] = useState([]);
